@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // 対話的セットアップスクリプト
 
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { generateColorPalette } from "./lib/color-utils.js";
@@ -48,10 +49,11 @@ async function main() {
 
     try {
       // ファイルパス
-      const rootDir = join(process.cwd(), "..");
+      const scriptDir = dirname(fileURLToPath(import.meta.url));
+      const rootDir = join(scriptDir, "..");
       const envPath = join(rootDir, ".env.local");
       const configPath = join(
-        process.cwd(),
+        scriptDir,
         "configs",
         "teams",
         `${config.team.id}.jsonc`,

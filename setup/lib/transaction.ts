@@ -48,20 +48,56 @@ export async function commitTransaction(transaction: Transaction) {
 }
 
 /**
+ * ロールバック失敗時のエラー
+ */
+export class RollbackError extends Error {
+  constructor(
+    message: string,
+    public readonly errors: unknown[],
+  ) {
+    super(message);
+    this.name = "RollbackError";
+  }
+}
+
+/**
  * トランザクションロールバック
+ * @throws {RollbackError} ロールバック中にエラーが発生した場合
  */
 export async function rollbackTransaction(transaction: Transaction) {
-  // 作成したファイルを削除
+  const errors: unknown[] = [];
+
+  // 作成したファイルを削除（順次実行で競合回避）
   for (const filePath of transaction.files) {
-    if (existsSync(filePath)) {
-      await unlink(filePath);
+    try {
+      if (existsSync(filePath)) {
+        await unlink(filePath);
+      }
+    } catch (error) {
+      errors.push(error);
     }
   }
 
-  // バックアップから復元
-  for (const [originalPath, backupPath] of transaction.backups) {
-    if (existsSync(backupPath)) {
-      await rename(backupPath, originalPath);
+  // バックアップから復元（順次実行で競合回避）
+  for (const [originalPath, backupPath] of transaction.backups.entries()) {
+    try {
+      if (existsSync(backupPath)) {
+        await rename(backupPath, originalPath);
+      }
+    } catch (error) {
+      errors.push(error);
     }
+  }
+
+  // エラーがあれば例外をスロー
+  if (errors.length > 0) {
+    console.error("ロールバック中にエラーが発生しました:");
+    for (const error of errors) {
+      console.error(error);
+    }
+    throw new RollbackError(
+      `Rollback failed with ${errors.length} error(s). System may be in inconsistent state.`,
+      errors,
+    );
   }
 }

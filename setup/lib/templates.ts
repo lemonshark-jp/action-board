@@ -25,12 +25,14 @@ export function generateEnvTemplate(config: TeamConfig): string {
     lines.push(`NEXT_PUBLIC_ACCENT_LIGHT_COLOR="${config.colors.accentLight}"`);
   }
 
-  if (config.site?.url) {
-    lines.push("", "# Site", `NEXT_PUBLIC_SITE_URL="${config.site.url}"`);
-  }
-
-  if (config.site?.email) {
-    lines.push(`NEXT_PUBLIC_SUPPORT_EMAIL="${config.site.email}"`);
+  if (config.site?.url || config.site?.email) {
+    lines.push("", "# Site");
+    if (config.site.url) {
+      lines.push(`NEXT_PUBLIC_SITE_URL="${config.site.url}"`);
+    }
+    if (config.site.email) {
+      lines.push(`NEXT_PUBLIC_SUPPORT_EMAIL="${config.site.email}"`);
+    }
   }
 
   return `${lines.join("\n")}\n`;

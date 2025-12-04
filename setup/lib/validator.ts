@@ -8,10 +8,10 @@ export function validateTeamId(id: string): boolean {
 }
 
 /**
- * HEXカラーコードのバリデーション
+ * HEXカラーコードのバリデーション（3桁・6桁両方対応）
  */
 export function validateHexColor(color: string): boolean {
-  return /^#[0-9A-Fa-f]{6}$/.test(color);
+  return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(color);
 }
 
 /**

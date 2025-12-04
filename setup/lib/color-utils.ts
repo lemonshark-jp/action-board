@@ -1,5 +1,7 @@
 // カラーパレット生成
 
+import { validateHexColor } from "./validator.js";
+
 export interface HSL {
   h: number;
   s: number;
@@ -7,11 +9,26 @@ export interface HSL {
 }
 
 /**
- * HEXカラーをHSLに変換
+ * HEXカラーをHSLに変換（3桁・6桁両方対応）
+ * @param hex - #付きのHEXカラー（例: #FFF, #FFFFFF）
+ * @throws バリデーション失敗時にエラー
  */
 export function hexToHsl(hex: string): HSL {
+  // 共通バリデーション関数を使用
+  if (!validateHexColor(hex)) {
+    throw new Error(`Invalid hex color format: ${hex}`);
+  }
+
   // Remove # if present
-  const cleanHex = hex.replace(/^#/, "");
+  let cleanHex = hex.replace(/^#/, "");
+
+  // Expand 3-digit hex to 6-digit
+  if (cleanHex.length === 3) {
+    cleanHex = cleanHex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
 
   // Parse hex values
   const r = Number.parseInt(cleanHex.substring(0, 2), 16) / 255;

@@ -1,6 +1,6 @@
 // 対話的プロンプト
 
-import { confirm, input } from "@inquirer/prompts";
+import { input } from "@inquirer/prompts";
 import type { TeamConfig } from "./config.js";
 import {
   validateEmail,
@@ -41,11 +41,6 @@ export async function promptTeamConfig(): Promise<TeamConfig> {
         return "HEX形式で入力してください（例: #FF0000）";
       return true;
     },
-  });
-
-  const autoGenerateColors = await confirm({
-    message: "カラーパレットを自動生成しますか？",
-    default: true,
   });
 
   const siteUrl = await input({

@@ -80,7 +80,7 @@ users-prefecture-export.csv
 /setup/dist
 /setup/~
 /setup/public
-/~/.bun
+/setup/.bun
 
 # backup files
 *.backup
